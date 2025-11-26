@@ -1,0 +1,256 @@
+*{box-sizing:border-box}
+body{font-family:Arial,system-ui,sans-serif;max-width:960px;margin:0 auto;padding:20px;background:#f6f7fb;color:#0f172a}
+h1{margin:0 0 6px;font-size:22px}
+.subtitle{margin:0 0 18px;color:#64748b}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px;box-shadow:0 6px 16px rgba(0,0,0,.05);margin:14px 0}
+.label{font-weight:700;margin-bottom:6px;display:block}
+.muted{color:#64748b;font-size:13px}
+.checkbox{display:block;margin-top:8px;color:#334155}
+select, input[type="text"], input[type="file"]{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{padding:10px 14px;border:1px solid #cbd5e1;background:#f1f5f9;border-radius:10px;cursor:pointer;font-weight:700}
+button:hover{background:#e2e8f0}
+button.ghost{background:transparent}
+.question{font-size:14px;margin:12px 0}
+
+/* Enunciado MUY visible */
+#questionText {
+  font-size: clamp(14px, 2.4vw, 27px);
+  font-weight: 800;
+  line-height: 1.35;
+  color: #0b1220;
+  margin: 6px 0 12px;
+}
+#questionNumber {
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  letter-spacing: .2px;
+  margin-bottom: 4px;
+}
+#questionMeta {
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* Opciones grandes y sombreadas */
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#answerOptions button{display:block;width:100%;text-align:left;padding:18px;margin-bottom:0;font-size:18px;line-height:1.4;background:#f7f7f7;border:1px solid #cbd5e1;border-radius:10px;box-shadow:2px 2px 6px rgba(0,0,0,0.08);transition:all .15s ease}
+#answerOptions button:hover{background:#eceff3;box-shadow:3px 3px 8px rgba(0,0,0,0.14)}
+#answerOptions button:active{background:#e0e5ea;transform:scale(.99)}
+#answerOptions button.correct{background:#d1fae5;border-color:#10b981;color:#065f46;box-shadow:3px 3px 8px rgba(16,185,129,0.35);font-weight:700}
+#answerOptions button.incorrect{background:#fee2e2;border-color:#ef4444;color:#7f1d1d;box-shadow:3px 3px 8px rgba(239,68,68,0.35);font-weight:700}
+
+.feedback{min-height:22px;margin-top:8px;font-weight:700}
+#failedQuestionsDisplay{background:#fff7ed;border-left:4px solid #f59e0b;padding:10px;border-radius:8px}
+.modal{position:fixed;inset:0;background:rgba(2,6,23,.5);display:flex;align-items:center;justify-content:center}
+.modal-content{background:#fff;border-radius:12px;padding:16px;max-width:800px;width:95%}
+#statsTable{width:100%;border-collapse:collapse}
+#statsTable th,#statsTable td{border:1px solid #e2e8f0;padding:8px;text-align:center}
+
+/* Personalización mínima de tamaño de texto */
+#questionText{font-size:var(--q-font-size,clamp(14px,2.4vw,27px))}
+#answerOptions button{font-size:var(--opt-font-size,18px)}
+
+/* === Opciones avanzadas (opt-in, no cambian el estilo por defecto) === */
+/* 2 columnas SOLO si #answerOptions tiene .cols-2 */
+#answerOptions.cols-2{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+}
+
+/* Padding de botones SOLO si <body> tiene .btnpad-custom */
+body.btnpad-custom #answerOptions button{ padding: var(--btn-pad, 10px); }
+
+/* Ocultar cronómetro SOLO si <body> tiene .hide-timer */
+body.hide-timer #timer{ display:none !important; }
+
+/* Temas SOLO si <body> tiene .use-theme-vars + la variante */
+body.use-theme-vars{
+  --bg: #f6f7fb;
+  --text: #0f172a;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+}
+body.use-theme-vars{ background: var(--bg); color: var(--text); }
+body.use-theme-vars .card{ background: var(--card-bg); border-color: var(--border); }
+body.use-theme-vars .muted{ color: var(--muted); }
+
+body.use-theme-vars.theme-dark{
+  --bg:#0b1220; --text:#e6edf3; --card-bg:#111827; --border:#263043; --muted:#9aa5b1;
+}
+body.use-theme-vars.theme-contrast{
+  --bg:#000000; --text:#ffffff; --card-bg:#000000; --border:#ffffff; --muted:#ffffff;
+}
+
+/* === Fix legibilidad del enunciado en tema oscuro/alto contraste === */
+body.use-theme-vars.theme-dark #questionText,
+body.use-theme-vars.theme-contrast #questionText{
+  color: var(--text) !important;
+}
+
+/* === Fix visibilidad global en temas oscuro/alto contraste (cambios mínimos) === */
+body.use-theme-vars.theme-dark,
+body.use-theme-vars.theme-contrast{
+  color: var(--text);
+}
+
+/* Botones genéricos y de opciones */
+body.use-theme-vars.theme-dark button,
+body.use-theme-vars.theme-contrast button{
+  color: var(--text);
+  background: var(--card-bg);
+  border-color: var(--border);
+}
+body.use-theme-vars.theme-dark #answerOptions button,
+body.use-theme-vars.theme-contrast #answerOptions button{
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+/* Hover/active/focus mínimos para que se distingan */
+body.use-theme-vars.theme-dark button:hover,
+body.use-theme-vars.theme-contrast button:hover{
+  filter: brightness(1.06);
+}
+body.use-theme-vars.theme-dark button:active,
+body.use-theme-vars.theme-contrast button:active{
+  filter: brightness(0.98);
+}
+body.use-theme-vars.theme-dark :focus-visible,
+body.use-theme-vars.theme-contrast :focus-visible{
+  outline: 2px solid var(--border);
+  outline-offset: 2px;
+}
+
+/* Inputs/selects para que se lean bien */
+body.use-theme-vars.theme-dark input,
+body.use-theme-vars.theme-contrast input,
+body.use-theme-vars.theme-dark select,
+body.use-theme-vars.theme-contrast select,
+body.use-theme-vars.theme-dark textarea,
+body.use-theme-vars.theme-contrast textarea{
+  color: var(--text);
+  background: var(--card-bg);
+  border-color: var(--border);
+  caret-color: var(--text);
+}
+body.use-theme-vars.theme-dark ::placeholder,
+body.use-theme-vars.theme-contrast ::placeholder{
+  color: var(--muted);
+}
+
+/* Cards, etiquetas y textos secundarios ya heredan; reforzamos títulos/labels si algún navegador no hereda bien */
+body.use-theme-vars.theme-dark .label,
+body.use-theme-vars.theme-contrast .label,
+body.use-theme-vars.theme-dark h1, 
+body.use-theme-vars.theme-contrast h1,
+body.use-theme-vars.theme-dark h2, 
+body.use-theme-vars.theme-contrast h2{
+  color: var(--text);
+}
+
+/* Temporizador y otros microelementos */
+body.use-theme-vars.theme-dark #timer,
+body.use-theme-vars.theme-contrast #timer{
+  color: var(--text);
+}
+
+/* Enlaces legibles */
+body.use-theme-vars.theme-dark a,
+body.use-theme-vars.theme-contrast a{
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* Estado disabled visible */
+body.use-theme-vars.theme-dark button:disabled,
+body.use-theme-vars.theme-contrast button:disabled{
+  color: var(--muted);
+  border-color: var(--border);
+  opacity: 0.8;
+}
+
+
+/* === Fix: visibilidad "Preguntas falladas" + estados correcto/incorrecto en temas oscuros/alto contraste === */
+body.use-theme-vars.theme-dark #failedQuestionsDisplay,
+body.use-theme-vars.theme-contrast #failedQuestionsDisplay{
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+  border-left-color: #f59e0b !important; /* mantiene acento ámbar */
+}
+body.use-theme-vars.theme-dark #failedQuestionsDisplay button,
+body.use-theme-vars.theme-contrast #failedQuestionsDisplay button{
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Estados de respuesta con contraste adecuado */
+body.use-theme-vars.theme-dark #answerOptions button.correct,
+body.use-theme-vars.theme-contrast #answerOptions button.correct{
+  color: var(--text);
+  background: rgba(16,185,129,0.18); /* verde translúcido */
+  border-color: #10b981;
+  box-shadow: none;
+  font-weight: 700;
+}
+body.use-theme-vars.theme-dark #answerOptions button.incorrect,
+body.use-theme-vars.theme-contrast #answerOptions button.incorrect{
+  color: var(--text);
+  background: rgba(239,68,68,0.20); /* rojo translúcido */
+  border-color: #ef4444;
+  box-shadow: none;
+  font-weight: 700;
+}
+
+/* === Fix mínimo: 1 columna cuando NO se seleccionan 2 columnas === */
+#answerOptions.options:not(.cols-2){
+  display: grid;
+  grid-template-columns: 1fr !important;
+}
+
+
+/* === Mejora de estadísticas en modo oscuro/alto contraste + scroll === */
+.modal-content{
+  max-height: 85vh;
+  overflow: auto;
+}
+body.use-theme-vars.theme-dark .modal-content,
+body.use-theme-vars.theme-contrast .modal-content{
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+body.use-theme-vars.theme-dark #statsTable th,
+body.use-theme-vars.theme-dark #statsTable td,
+body.use-theme-vars.theme-contrast #statsTable th,
+body.use-theme-vars.theme-contrast #statsTable td{
+  border-color: var(--border);
+  color: var(--text);
+  background: transparent;
+}
+body.use-theme-vars.theme-dark #statsModal h3,
+body.use-theme-vars.theme-contrast #statsModal h3{
+  color: var(--text);
+}
+
+/* === Navegación: estilos diferenciados === */
+#nextButton { background: #2563eb; color: #fff; border: 1px solid #1d4ed8; }
+#nextButton:hover { filter: brightness(1.05); }
+#prevButton { background: #10b981; color: #fff; border: 1px solid #059669; }
+#prevButton:hover { filter: brightness(1.05); }
+/* El botón de estadísticas mantiene la clase .ghost existente */
+
+/* === Navegación: estilos diferenciados (pastel) === */
+#nextButton { background: #93c5fd; color: #0f172a; border: 1px solid #60a5fa; }
+#nextButton:hover { filter: brightness(1.05); }
+
+#prevButton { background: #86efac; color: #0f172a; border: 1px solid #4ade80; }
+#prevButton:hover { filter: brightness(1.05); }
+/* El botón de estadísticas mantiene la clase .ghost existente */
+

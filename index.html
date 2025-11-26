@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cuestionario por Temas</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#f6f7fb">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js').catch(function(err) {
+          console.error('Error registrando el Service Worker', err);
+        });
+      });
+    }
+  </script>
+<style>
+  /* Fuerza oculto al inicio; visible solo con .show-config en <body> */
+  #typographySettings, #advancedSettings { display: none !important; }
+  body.show-config #typographySettings, body.show-config #advancedSettings { display: block !important; }
+</style>
+
+</head>
+<body>
+  <header>
+    <h1>CUESTIONARIO POR TEMAS</h1>
+<button
+  id="configToggleBtn"
+  class="ghost"
+  onclick="(function(b){var o=document.body.classList.toggle('show-config');b.setAttribute('aria-expanded',o?'true':'false');})(this)"
+  aria-expanded="false"
+  aria-controls="typographySettings advancedSettings"
+>
+  Configuración
+</button>
+    
+  </header>
+
+  <section id="typographySettings" class="card">
+      <h2 style="margin-top:0;">Apariencia</h2>
+      <div id="typographyBasic" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+        <div>
+          <label class="label" for="qFontSize">Tamaño del enunciado</label>
+          <input id="qFontSize" type="range" min="14" max="36" step="1" value="22">
+          <div class="muted">Valor: <span id="qFontSizeValue">22</span> px</div>
+        </div>
+        <div>
+          <label class="label" for="optFontSize">Tamaño de las opciones</label>
+          <input id="optFontSize" type="range" min="12" max="28" step="1" value="18">
+          <div class="muted">Valor: <span id="optFontSizeValue">18</span> px</div>
+        </div>
+        <div>
+          <label class="label" for="persistTypography">Guardar configuración (toda la app)</label>
+          <select id="persistAll">
+            <option value="off" selected>No (usar valores por defecto al iniciar)</option>
+            <option value="on">Sí (recordar mis ajustes)</option>
+          </select>
+          <div class="muted">Si eliges "No", los cambios solo duran mientras esta página esté abierta.</div>
+        </div>
+      </div>
+    </section>
+
+<section id="advancedSettings" class="card">
+  <h2 style="margin-top:0;">Más opciones</h2>
+  <div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+    <div>
+      <label class="label" for="optColumns">Densidad (opciones por fila)</label>
+      <select id="optColumns">
+        <option value="1">1 columna</option>
+        <option value="2">2 columnas</option>
+      </select>
+    </div>
+    <div>
+      <label class="label" for="btnPadding">Tamaño de botones (padding)</label>
+      <input id="btnPadding" type="range" min="6" max="22" step="1" value="10"/>
+      <div class="muted">Valor: <span id="btnPaddingValue">10</span> px</div>
+    </div>
+    <div>
+      <label class="label" for="themePreset">Tema</label>
+      <select id="themePreset">
+        <option value="off">Sin cambios</option>
+        <option value="dark">Oscuro</option>
+        <option value="contrast">Alto contraste</option>
+      </select>
+      <div class="muted">“Sin cambios” mantiene exactamente tu estilo actual.</div>
+    </div>
+    <div>
+      <label class="label" for="kbdShortcuts">Atajos de teclado</label>
+      <select id="kbdShortcuts">
+        <option value="off">Desactivados</option>
+        <option value="on">Activados (A/B/C/D, Enter)</option>
+      </select>
+    </div>
+    <div>
+      <label class="label" for="autoNext">Auto-siguiente</label>
+      <select id="autoNext">
+        <option value="off">Desactivado</option>
+        <option value="on">Activado</option>
+      </select>
+      <label class="label" for="autoNextDelay" style="margin-top:6px;">Retardo (ms)</label>
+      <input id="autoNextDelay" type="range" min="0" max="10000" step="100" value="0"/>
+      <div class="muted">Valor: <span id="autoNextDelayValue">0</span> ms</div>
+    </div>
+    <div>
+      <label class="label" for="toggleTimer">Cronómetro</label>
+      <select id="toggleTimer">
+        <option value="show">Mostrar</option>
+        <option value="hide">Ocultar</option>
+      </select>
+    </div>
+</div>
+</section>
+
+
+<section class="card" id="quizSelector">
+  <label class="label" for="quizSelect">Elige cuestionario</label>
+  <select id="quizSelect"></select>
+  <div class="actions" style="margin-top:8px;">
+    <button id="loadQuizBtn">Cargar cuestionario</button>
+    <button id="updateQuizzesBtn" class="ghost">Actualizar cuestionarios</button>
+  </div>
+  <div id="loadStatus" class="muted" style="margin-top:6px;">Selecciona un cuestionario para empezar.</div>
+</section>
+<!-- === Configuración avanzada (no intrusiva) === -->
+
+<!-- === Apariencia (mínimo) === -->
+    
+    
+
+  <section id="themeSelector" class="card" style="display:none;">
+    <h2>Selección por temas</h2>
+    <label for="themeDropdown">Selecciona uno o varios temas</label>
+    <select id="themeDropdown" multiple size="10"></select>
+    <label class="checkbox"><input type="checkbox" id="selectAllThemes"> Seleccionar todos</label>
+    <div class="actions">
+      <button id="applyThemesBtn">Aplicar selección de temas</button>
+      <button id="clearThemesBtn" class="ghost">Limpiar selección</button>
+    </div>
+    <div id="selectedThemes">
+      <strong>Temas seleccionados:</strong>
+      <ul id="selectedThemesList"></ul>
+    </div>
+  </section>
+
+  <section id="numberSelector" class="card" style="display:none;">
+    <h2>Selección por números</h2>
+    <label for="numbersInput">Introduce números de pregunta separados por coma</label>
+    <input type="text" id="numbersInput" placeholder="Ej.: 12, 45, 78">
+    <div class="actions">
+      <button id="applyNumbersBtn">Aplicar selección por números</button>
+      <button id="clearNumbersBtn" class="ghost">Limpiar</button>
+    </div>
+  </section>
+
+  <section id="quizContainer" class="card" style="display:none;">
+    <div id="questionHeader">
+      <div id="questionNumber"></div>
+      <div id="questionMeta"></div>
+    </div>
+    <div id="questionText" class="question"></div>
+    <div id="answerOptions" class="options"></div>
+    <div id="feedback" class="feedback"></div>
+    <div class="actions">
+      <button id="nextButton" style="display:none;">Siguiente</button>            <button id="prevButton">Anterior</button>
+      <button id="statsButton" class="ghost">Estadísticas</button>
+      <button id="saveSessionBtn" class="btn btn--outline">💾 Guardar sesión</button>
+    </div>
+  </section>
+
+  <section id="failedPanel" class="card" style="display:none;">
+    <div id="failedQuestionsDisplay"></div>
+  </section>
+
+  <section id="stats" class="card" style="display:none;">
+    <p>Total: <span id="totalQuestions">0</span> · Respondidas: <span id="answeredCount">0</span> · Restantes: <span id="remainingCount">0</span></p>
+    <p>Aciertos: <span id="correctCount">0</span> · Fallos: <span id="incorrectCount">0</span> · Puntuación: <span id="score">0</span></p>
+    <p id="timer">Tiempo transcurrido: 00:00:00</p>
+  </section>
+
+  <div id="statsModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>Estadísticas por tema</h3>
+      <table id="statsTable">
+        <thead><tr><th>Tema</th><th>Presentadas</th><th>Aciertos</th><th>Fallos</th><th>% Acierto</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button id="closeStatsBtn">Cerrar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+
+<!-- Modal de restauración de sesión -->
+<div id="sessionRestoreModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Sesión guardada encontrada</h3>
+    <p>¿Quieres continuar con la sesión anterior?</p>
+    <div class="actions">
+      <button id="sessionRestoreYes" class="btn btn--primary">Sí, continuar</button>
+      <button id="sessionRestoreNo" class="btn btn--secondary">No, empezar de cero</button>
+<!-- Modal de restauración de sesión -->
+<div id="sessionRestoreModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Sesión guardada encontrada</h3>
+    <p>¿Quieres continuar con la sesión anterior?</p>
+    <div class="actions">
+      <button id="sessionRestoreYes" class="btn btn--primary">Sí, continuar</button>
+      <button id="sessionRestoreNo" class="btn btn--secondary">No, empezar de cero</button>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
